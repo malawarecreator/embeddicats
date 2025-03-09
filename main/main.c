@@ -17,7 +17,6 @@ TaskHandle_t tracktime_handle = NULL;
 TaskHandle_t wait_5min_handle = NULL;
 
 void app_main(void) {
-    xTaskCreatePinnedToCore(blink, "Blink GPIO2", 1024, NULL, 10, &blink_handle, 0);
     start_work_session();  
 }
 
@@ -47,11 +46,17 @@ void tracktime(void* arg) {
         if (time_passed / 60 >= 25) {
             printf("It's been 25 minutes! Break time!\n");
             start_break_session();  
+            vTaskDelete(NULL); // End this task
         }
     }
 }
 
 void wait_5min(void* arg) {
+    if (blink_handle != NULL) {
+        vTaskDelete(blink_handle);
+        blink_handle = NULL;
+    }
+
     int time_passed = 0;
     printf("Break started! Relax for 5 minutes.\n");
 
@@ -66,11 +71,16 @@ void wait_5min(void* arg) {
         if (time_passed / 60 >= 5) {
             printf("Break's Over! Back to work!\n");
             start_work_session();  
+            vTaskDelete(NULL); 
         }
     }
 }
 
 void start_work_session() {
+    if (blink_handle == NULL) {
+        xTaskCreatePinnedToCore(blink, "Blink GPIO2", 2048, NULL, 10, &blink_handle, 0);
+    }
+
     if (tracktime_handle != NULL) {
         vTaskDelete(tracktime_handle);
         tracktime_handle = NULL;
@@ -79,7 +89,7 @@ void start_work_session() {
         vTaskDelete(wait_5min_handle);
         wait_5min_handle = NULL;
     }
-
+    
     xTaskCreatePinnedToCore(tracktime, "Track Time", 4096, NULL, 10, &tracktime_handle, 1);
 }
 
