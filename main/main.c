@@ -46,8 +46,9 @@ void tracktime(void* arg) {
         if (time_passed / 60 >= 25) {
             printf("It's been 25 minutes! Break time!\n");
             start_break_session();  
-            vTaskDelete(NULL); // End this task
+            vTaskDelete(NULL); 
         }
+        printf("DEBUG: %d\n", time_passed);
     }
 }
 
