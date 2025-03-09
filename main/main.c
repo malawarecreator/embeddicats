@@ -21,7 +21,7 @@ void app_main(void) {
 }
 
 void blink(void *arg) {
-    printf("Blink task started\n");
+    ESP_LOGI("UPDATE", "Blink task started\n");
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
     while (1) {
         gpio_set_level(LED, 1);
@@ -33,22 +33,22 @@ void blink(void *arg) {
 
 void tracktime(void* arg) {
     int time_passed = 0;
-    printf("Embeddicat Time tracking started\n");
+    ESP_LOGI("UPDATE","Embeddicat Time tracking started\n");
 
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         time_passed++;
 
         if (time_passed % 60 == 0) {
-            printf("Embeddicat Pomodoro Timer: %d minutes\n", time_passed / 60);
+            ESP_LOGI("UPDATE","Embeddicat Pomodoro Timer: %d minutes\n", time_passed / 60);
         }
 
         if (time_passed / 60 >= 25) {
-            printf("It's been 25 minutes! Break time!\n");
+            ESP_LOGI("UPDATE","It's been 25 minutes! Break time!\n");
             start_break_session();  
             vTaskDelete(NULL); 
         }
-        printf("DEBUG: %d\n", time_passed);
+        ESP_LOGI("DEBUGMSG", "%d\n", time_passed);
     }
 }
 
@@ -59,18 +59,16 @@ void wait_5min(void* arg) {
     }
 
     int time_passed = 0;
-    printf("Break started! Relax for 5 minutes.\n");
+    ESP_LOGI("UPDATE","Break started! Relax for 5 minutes.\n");
 
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         time_passed++;
 
-        if (time_passed % 60 == 0) {
-            printf("Break Timer: %d minutes\n", time_passed / 60);
-        }
+        
 
         if (time_passed / 60 >= 5) {
-            printf("Break's Over! Back to work!\n");
+            ESP_LOGI("UPDATE", "Break's Over! Back to work!\n");
             start_work_session();  
             vTaskDelete(NULL); 
         }
